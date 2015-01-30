@@ -226,6 +226,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     		$(".addQ").click(function(){
     			addQ($(this));
     		});
+    		
     	});
     	}
     	
