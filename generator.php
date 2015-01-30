@@ -179,6 +179,32 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     	var qN =1; // Question being editted
     	var query = "questions";
     	var c_id = "<?php echo $sub['course_id'] ; ?>";
+    	
+    	function refreshBank(){
+			$(".tab-pane").each(function(){
+    			var id = $(this).attr("id").substring(1);
+    			$("#u"+id).html('<div class="spinner-container"><div class="spinner" ><img width="50px" src="img/loader.gif"/></div></div>');
+    			$.ajax({
+		              type: "get",
+		              url: "fetch.php",
+		              data: { q: query ,course_id :c_id, unit:id},
+		              cache: false,
+		              async : false
+		            })
+		              .done(function( html ) {
+		              	
+			                $("#u"+id).html(html); 
+			                
+					});
+    		});
+		}
+
+		$("#refresh").click(refreshBank);
+    	
+    	refreshBank();
+    	
+    	
+    		
 		
 		$("#qplus").click(function(){
 			qN++;
@@ -191,27 +217,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 			assignQHandler();
 		});
 
-		function refreshBank(){
-			$(".tab-pane").each(function(){
-    			var id = $(this).attr("id").substring(1);
-    			$("#u"+id).html('<div class="spinner-container"><div class="spinner" ><img width="50px" src="img/loader.gif"/></div></div>');
-    			$.ajax({
-		              type: "get",
-		              url: "fetch.php",
-		              data: { q: query ,course_id :c_id, unit:id},
-		              cache: false
-		            })
-		              .done(function( html ) {
-		              	
-			                $("#u"+id).html(html); 
-			               	
-					});
-    		});
-		}
-
-		$("#refresh").click(refreshBank);
-    	
-    	refreshBank();
+		
 
     	$('#myTab a:first').tab('show') ;
 
@@ -234,8 +240,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 
     	function addQ(ref){
     		
-    		
-    			container.prepend(ref.parents().eq(4));
+      			container.prepend(ref.parents().eq(4));
     			ref.removeClass("btn-success");
     			ref.addClass("btn-danger");
     			ref.html("Remove");
@@ -253,6 +258,9 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     				removeQ($(this));
     			});
     			$("#myModal").modal('hide');
+    			ref.parents().eq(4).hide('fast').delay(500).show('slow');
+    			
+    			
     		
     	}
 
@@ -283,6 +291,25 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     		
     		//alert("total:"+total);
     	}
+    	
+    	function populateQuestions(){
+    		
+    		for (var i = 1; i <= noQ; i++) {
+    			// Decide on two, three or 4 questions
+    			n = [2,3,4];
+    			n = n[Math.floor(Math.random() * n.length)];
+    			q = $(".tab-content .addQ").first();
+    			//alert('Adding to Question '+i+' '+q.html());
+    			container = $(".addSub").eq(i-1).parent();
+    			addQ(q);
+    			// switch(n){
+    				// case 2:
+//     					
+    					// break;
+    			}
+    			
+    		};
+    	populateQuestions();
 
     	function convertDate(inputFormat) {
 		  function pad(s) { return (s < 10) ? '0' + s : s; }
