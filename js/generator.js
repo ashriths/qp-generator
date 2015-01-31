@@ -56,19 +56,21 @@ var noQ = 3; // Total questions
     	}
     	
     	function getMarksFromQuestion(ref){
-    		$("#q"+i+" input[type='number']").each(function(){
-    				total+=parseInt($(this).val());
-    			});
+    		return $(ref).find("input[type='number']").val();
     	}
     	
     	function populateQuestions(){
     		for (var i = 1; i <= noQ; i++) {
-    			var total=0;
-    			$("#q"+i+" input[type='number']").each(function(){
-    				total+=parseInt($(this).val());
-    			});
-    			//alert(i+"Q"+total);
-    			$("#q"+i+" .badge").html(total);
+    			// Decide on two, three or 4 questions
+    			n = [2,3,4];
+    			n = n[Math.floor(Math.random() * n.length)];
+    			switch(n){
+    				case 2:
+    					q = $(".addQ [marks='10']").first();
+    					addQ(q);
+    					break;
+    			}
+    			
     		};
     	}
     	
@@ -102,7 +104,7 @@ var noQ = 3; // Total questions
     		 
     				ref.addClass("btn-success");
     				ref.removeClass("btn-danger");
-    				$("#u"+ref.attr("unit")).prepend(ref.parents().eq(4))
+    				$("#u"+ref.attr("unit")).prepend(ref.parents().eq(4));
     				ref.html("Add");
 	    			var m = ref.parent().prev();
 	    			m.attr("disabled","disabled");
