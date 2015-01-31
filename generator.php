@@ -16,6 +16,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     <?php
     $design->getIncludeFiles($rp);
     ?>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
       <title>Question Paper Generator | BMSCE</title>
   </head>
   <body >
@@ -74,18 +75,21 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 				    			<div id="q1" class="panel panel-info">
 				    				<div class="panel-heading"><input class="text-center" placeholder="Enter Unit or Question no" id="q1Title" value="<?php if($_POST['test']=="SEE") echo "Unit" ; else echo "Question"; ?> 1"/> <a class="pull-right" href="#"><span class="badge" style="font-size:1em">0</span>  marks</a> </div>
 				    				<div class="panel-body">
+				    					<div class="sub-container"></div>
 				    					<button title="Add Question" type="button" id="q1plus" question="1" class="addSub btn btn-success" >Add Subquestion</button>
 				    				</div>
 				    			</div>
 				    			<div id="q2" class="panel panel-info">
 				    				<div class="panel-heading"><input class="text-center" id="q2Title" placeholder="Enter Unit or Question no" value="<?php if($_POST['test']=="SEE") echo "Unit" ; else echo "Question"; ?> 2"/> <a class="pull-right" href="#"><span class="badge" style="font-size:1em">0</span>  marks</a> </div>
 				    				<div class="panel-body">
+				    					<div class="sub-container"></div>
 				    					<button title="Add Question" type="button" id="q1plus" question="2" class=" addSub btn btn-success" >Add Subquestion</button>
 				    				</div>
 				    			</div>
 				    			<div id="q3" class="panel panel-info">
 				    				<div class="panel-heading"><input class="text-center" placeholder="Enter Unit or Question no" id="q3Title" value="<?php if($_POST['test']=="SEE") echo "Unit" ; else echo "Question"; ?> 3"/><a class="pull-right" href="#"><span class="badge" style="font-size:1em">0</span>  marks</a> </div>
 				    				<div class="panel-body">
+				    					<div class="sub-container"></div>
 				    					<button title="Add Question" type="button" id="q1plus" question="3" class="addSub btn btn-success" >Add Subquestion</button>
 				    				</div>
 				    			</div>
@@ -170,6 +174,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     <?php
         $design->getJSIncludes($rp);
     ?>
+    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
     <script type="text/javascript">
 
 
@@ -211,6 +216,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 			$("#questions").append('<div id="q1" class="panel panel-info">\
 				    				<div class="panel-heading"><input class="text-center" placeholder="Enter Unit or Question no" id="q'+qN+'Title" value="<?php if($_POST['test']=="SEE") echo "Unit" ; else echo "Question"; ?> '+qN+'"/> <a class="pull-right" href="#"><span class="badge" style="font-size:1em">0</span>  marks</a> </div>\
 				    				<div class="panel-body">\
+				    					<div class="sub-container"></div>\
 				    					<button title="Add Question" type="button" id="q'+qN+'plus" question="'+qN+'" class="addSub btn btn-success" >Add Subquestion</button>\
 				    				</div>\
 				    			</div>');
@@ -225,47 +231,58 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 
     	function assignQHandler(){
     		$(".addSub").click(function(){
-    		container = $(this).parent();
-    		qN = $(this).attr("question");
-    		//alert(qN);
-    		$("#myModal").modal('show');
-    		$(".addQ").click(function(){
-    			addQ($(this));
+	    		container = $(this).parent();
+	    		qN = $(this).attr("question");
+	    		//alert(qN);
+	    		$("#myModal").modal('show');
+	    		$(".addQ").click(function(){
+	    			addQ($(this));
+	    		});
+    		
     		});
     		
-    	});
+    		$('.sub-container').each(function(){
+    				$(this).sortable({
+    					placeholder: "portlet-placeholder ui-state-highlight"
+    				});
+    			});
+    			
+    		
     	}
     	
     	assignQHandler();
 
     	function addQ(ref){
-    		
-      			container.prepend(ref.parents().eq(4));
+    			//alert('Add called Caller : '+ arguments.callee.caller.toString());
+    			ref.parents().eq(4).hide('fast');
+    			//alert(container.find('.sub-container').html());
+      			container.find('.sub-container').prepend(ref.parents().eq(4));
     			ref.removeClass("btn-success");
     			ref.addClass("btn-danger");
     			ref.html("Remove");
     			var m = ref.parent().prev();
     			m.removeAttr("disabled");
     			findTotal();
-    			m.change(function(){
+    			m.unbind().change(function(){
     				if(!parseInt($(this).val())){
     					alert("Enter a Numberic value");
     					$(this).focus();
     				}
     				findTotal();
     			});
-    			ref.click(function(){
+    			ref.unbind('click').click(function(){
     				removeQ($(this));
     			});
     			$("#myModal").modal('hide');
-    			ref.parents().eq(4).hide('fast').delay(500).show('slow');
-    			
+    			ref.parents().eq(4).slideDown();
+    			//alert(ref.click().length)
     			
     		
     	}
 
     	function removeQ(ref){
-    		 
+    				
+    		 		alert('Remove called Caller : '+ arguments.callee.caller.toString());
     				ref.addClass("btn-success");
     				ref.removeClass("btn-danger");
     				$("#u"+ref.attr("unit")).prepend(ref.parents().eq(4))
@@ -273,7 +290,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 	    			var m = ref.parent().prev();
 	    			m.attr("disabled","disabled");
 	    			findTotal();
-	    			ref.click(function(){
+	    			ref.unbind('click').click(function(){
 	    				addQ($(this));
 	    			});
     	}
@@ -298,7 +315,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     			// Decide on two, three or 4 questions
     			n = [2,3,4];
     			n = n[Math.floor(Math.random() * n.length)];
-    			q = $(".tab-content .addQ").first();
+    			q = $(".tab-content .addQ").eq(n);
     			//alert('Adding to Question '+i+' '+q.html());
     			container = $(".addSub").eq(i-1).parent();
     			addQ(q);
