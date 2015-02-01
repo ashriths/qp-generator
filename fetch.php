@@ -25,7 +25,7 @@ switch ($_GET['q']) {
              
             echo '
               
-                  <div class="sub-question well well-sm">
+                  <div data-toggle="tooltip" title="Drag this to ReOrder" class="sub-question well well-sm">
                     <div class="row">
                       <div class="col-md-1">
                               <button type="button" disabled class="btn btn-default">'.$q['question_id'].'</button>
@@ -36,7 +36,7 @@ switch ($_GET['q']) {
 
                        <div class="col-md-3">
                             <div class="input-group">
-                              <input type="number" title="Marks can be changed after adding the question to paper." disabled class="form-control" value="'.$q['marks'].'">
+                              <input type="number" title="Change marks to your requirement" disabled class="form-control" value="'.$q['marks'].'">
                               <span class="input-group-btn">
                                <button type="button" unit="'.$_GET['unit'].'" text="'.$q['text'].'" marks="'.$q['marks'].'" question="'.$q['question_id'].'" class="addQ btn btn-success">Add</button>
                               </span>

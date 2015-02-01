@@ -5,7 +5,7 @@ require ($rp.'redirect.php');
 require($rp.'php/design.php');
 require($rp.'php/function.php');
 
-print_r($_POST);
+//print_r($_POST);
 
 if(isset($_POST['course'])) {
 	$pos="";
@@ -21,6 +21,7 @@ if(isset($_POST['course'])) {
     <?php
     $design->getIncludeFiles($rp);
     ?>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
       <title>Question Paper Generator | BMSCE</title>
   </head>
   <body >
@@ -159,7 +160,7 @@ if(isset($_POST['course'])) {
 			});
     		
     	}
-
+		$(document).tooltip();
     	function afterSem(){
 				$( "#select-sem" ).change(function () {
 				    var se = $(this).val();
@@ -232,9 +233,13 @@ if(isset($_POST['course'])) {
 						$('<div class="form-group"> \
 										    <label for="test" class="col-sm-2 control-label">Question:</label>\
 										     <div class="col-sm-9">\
-										      <textarea id="select-text" name="text" class="form-control"></textarea>\
+										      <textarea data-toggle="popover" title="Write the Question Description" bdata-trigger="focus" data-placement="top" title="Similar Questions" id="select-text" name="text" class="form-control"></textarea>\
 											</div>\
-						 	 	</div>').appendTo("#myForm"); 
+						 	 	</div>').appendTo("#myForm");
+						 $( "#select-text" ).popover(
+						 	{
+						 		html:true,
+						 	}); 
 						 $( "#select-text" ).focus();   
 						 afterText();
 					}
@@ -243,6 +248,26 @@ if(isset($_POST['course'])) {
     	}
 
     	function afterText(){
+    		$('#select-text').keyup(function() {
+				if($(this).val().length>5){
+					var query='similar';
+					var sem=$('#select-sem').val();
+					var dept= $('#select-dept').val();
+					var t = $(this).val();
+					$.ajax({
+		              type: "get",
+		              url: "fetch.php",
+		              data: { q: query ,sem :se,dept:dep,text:t},
+		              cache: false
+		            })
+		            .done(function( reply ) {
+		           		$('#select-text').popover({
+		           			html:true,
+		           			data-content:reply
+		           		});
+		            });
+				}
+			});
 			$('#select-text').change(function(){
 				var co = $(this).val();
 				   
