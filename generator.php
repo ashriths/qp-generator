@@ -183,6 +183,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     	var questions =[];
     	var qN =1; // Question being editted
     	var query = "questions";
+    	//var tabs = ;
     	var c_id = "<?php echo $sub['course_id'] ; ?>";
     	
     	function refreshBank(){
@@ -235,7 +236,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 	    		qN = $(this).attr("question");
 	    		//alert(qN);
 	    		$("#myModal").modal('show');
-	    		$(".addQ").click(function(){
+	    		$(".addQ").unbind('click').click(function(){
 	    			addQ($(this));
 	    		});
     		
@@ -270,7 +271,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     				}
     				findTotal();
     			});
-    			ref.unbind('click').click(function(){
+    			ref.unbind().click(function(){
     				removeQ($(this));
     			});
     			$("#myModal").modal('hide');
@@ -282,7 +283,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 
     	function removeQ(ref){
     				
-    		 		alert('Remove called Caller : '+ arguments.callee.caller.toString());
+    		 		//alert('Remove called Caller : '+ arguments.callee.caller.toString());
     				ref.addClass("btn-success");
     				ref.removeClass("btn-danger");
     				$("#u"+ref.attr("unit")).prepend(ref.parents().eq(4))
@@ -290,7 +291,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 	    			var m = ref.parent().prev();
 	    			m.attr("disabled","disabled");
 	    			findTotal();
-	    			ref.unbind('click').click(function(){
+	    			ref.unbind("click").click(function(){
 	    				addQ($(this));
 	    			});
     	}
@@ -314,18 +315,41 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     		for (var i = 1; i <= noQ; i++) {
     			// Decide on two, three or 4 questions
     			n = [2,3,4];
-    			n = n[Math.floor(Math.random() * n.length)];
-    			q = $(".tab-content .addQ").eq(n);
-    			//alert('Adding to Question '+i+' '+q.html());
     			container = $(".addSub").eq(i-1).parent();
-    			addQ(q);
-    			// switch(n){
-    				// case 2:
-//     					
-    					// break;
+    			n = n[Math.floor(Math.random() * n.length)];
+    			//alert(n);
+    			switch(n){
+    				case 2:
+    						q = $(".tab-content .addQ[marks='10']").eq(0);
+    						addQ(q);
+    						q = $(".tab-content .addQ[marks='10']").eq(1);
+    						addQ(q);
+    					break;
+    				case 3:
+    						q = $(".tab-content .addQ[marks='10']").eq(0);
+    						addQ(q);
+    						q = $(".tab-content .addQ[marks='5']").eq(0);
+    						addQ(q);
+    						q = $(".tab-content .addQ[marks='5']").eq(0);
+    						addQ(q);
+    					break;
+    				case 4:
+	    					for (var i=0; i < 4; i++) {
+							  	q = $(".tab-content   .addQ[marks='5']").eq(0);
+	    						addQ(q);
+							}
+						break;
+    				
+    				
     			}
+    			//q = $(".tab-content .addQ[marks='5']").eq(n);
+    			//alert('Adding to Question '+i+' '+q.html());
     			
-    		};
+    			//addQ(q);
+    			
+//     			
+    		}
+    	}
     	populateQuestions();
 
     	function convertDate(inputFormat) {
