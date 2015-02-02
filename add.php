@@ -123,8 +123,7 @@ if(isset($_POST['course'])) {
     	
 
     	function resetForm(){
-
-    		$("#myForm").html('<div class="form-group">\
+			$("#myForm").html('<div class="form-group">\
 						    <label for="dept" class="col-sm-2 control-label">Department</label>\
 						    <div class="col-sm-9">\
 						      <select id="select-dept" name="dept" class="form-control">\
@@ -233,13 +232,14 @@ if(isset($_POST['course'])) {
 						$('<div class="form-group"> \
 										    <label for="test" class="col-sm-2 control-label">Question:</label>\
 										     <div class="col-sm-9">\
-										      <textarea data-toggle="popover" title="Write the Question Description" bdata-trigger="focus" data-placement="top" title="Similar Questions" id="select-text" name="text" class="form-control"></textarea>\
+										      <textarea data-trigger="focus" data-placement="bottom" title="Similar Questions" id="select-text" name="text" class="form-control"></textarea>\
 											</div>\
 						 	 	</div>').appendTo("#myForm");
 						 $( "#select-text" ).popover(
 						 	{
 						 		html:true,
 						 	}); 
+						 //alert('Here');
 						 $( "#select-text" ).focus();   
 						 afterText();
 					}
@@ -248,25 +248,29 @@ if(isset($_POST['course'])) {
     	}
 
     	function afterText(){
+    		//alert('after Text');
+    		var ajax=null;
     		$('#select-text').keyup(function() {
-				if($(this).val().length>5){
+    			var t = $(this).val().trim();
+    			
+				if(ajax){
+					ajax.abort();
+				}
+					//alert('fetch');
 					var query='similar';
-					var sem=$('#select-sem').val();
-					var dept= $('#select-dept').val();
-					var t = $(this).val();
-					$.ajax({
+					var cid=$('#select-course').val();
+					var u= $('#select-unit').val();
+					ajax = $.ajax({
 		              type: "get",
 		              url: "fetch.php",
-		              data: { q: query ,sem :se,dept:dep,text:t},
+		              data: { q: query ,course_id: cid,unit:u ,text:t},
 		              cache: false
 		            })
 		            .done(function( reply ) {
-		           		$('#select-text').popover({
-		           			html:true,
-		           			data-content:reply
-		           		});
+		            	$('.popover-content').html(reply);
+		            	$('.popover').css('width','100%');		            
 		            });
-				}
+				
 			});
 			$('#select-text').change(function(){
 				var co = $(this).val();
