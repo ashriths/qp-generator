@@ -25,13 +25,13 @@ switch ($_GET['q']) {
              
             echo '
               
-                  <div data-toggle="tooltip" title="Drag this to ReOrder" class="sub-question well well-sm">
+                  <div title="Click on Add to select" class="sub-question well well-sm">
                     <div class="row">
                       <div class="col-md-1">
                               <button type="button" disabled class="btn btn-default">'.$q['question_id'].'</button>
                       </div>
                       <div class="col-md-8">
-                      <div class="qtext">'.$q['text'].'</div> <strong> <span> [ '.$q['co'].", ".$q['po'].' ]</span></strong>
+                      <div class="qtext">'.$q['text'].'</div> <strong> <span> [ '.$q['co'].", ".$q['po'].' ]</span> from '.$q['unit'].'</strong>
                       </div>
 
                        <div class="col-md-3">
@@ -57,6 +57,30 @@ switch ($_GET['q']) {
           
     
     break;
+	
+case 'similar':
+	//prettyPrint($_GET); 
+	if(strlen($_GET['text']) < 1 || count(split(' ', $_GET['text'])) < 1 ){
+		echo 'Please start typing to see similar Questions';
+		exit;
+	}
+	$questions = getRelatedQuestions($_GET['course_id'],$_GET['unit'],$_GET['text']);
+	//echo '<pre>';print_r($questions);echo '</pre>';
+	
+	if($questions['count']==0){
+		echo 'Good work! No similar questions found. Go Ahead and add this question';
+		exit;
+	}
+	echo '<small><table class="table table-striped table-hover">';
+	$i= 0; //limit
+	echo '<tr><th>#</th><th>Question</td><th>Marks</th></tr>';
+	foreach ($questions['rows'] as $question) {
+		echo '<tr><th>'.($i+1).'</th><td>'.$question['text'].'</td><td><strong>('.$question['marks'].')</strong></td></tr>';
+		if(++$i>4) break;
+	}
+	
+	echo '</table></small>';
+	break;
   
   default:
     # code...
