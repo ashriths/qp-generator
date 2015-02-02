@@ -3,7 +3,7 @@
 $rp = './';
 require ($rp.'redirect.php');
 require($rp.'php/design.php');
-
+require_once 'php/config.php';
 
 ?><!DOCTYPE html>
 <html lang="en">
@@ -100,9 +100,11 @@ require($rp.'php/design.php');
 						    <label for="dept" class="col-sm-2 control-label">Department</label>\
 						    <div class="col-sm-9">\
 						      <select id="select-dept" name="dept" class="form-control">\
-								  <option selected disabled>Please Choose a Department</option>\
-								  <option>CSE</option>\
-								</select>\
+								  <option selected disabled>Please Choose a Department</option><?php 
+								  foreach($DEPT as $key => $value){
+								  		echo '<option>'.$key.'</option>';
+								  }
+								  ?></select>\
 						    </div>\
 						  </div>\
     				');
