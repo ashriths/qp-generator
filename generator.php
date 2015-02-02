@@ -5,6 +5,7 @@ require ($rp.'redirect.php');
 require($rp.'php/design.php');
 require($rp.'php/function.php');
 
+
 //print_r($_POST);
 
 $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
@@ -44,6 +45,8 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 						<input type="date" name="date" id="select-date" class="form-control" placeholder="Select Date">
 						<label for="duration" class="control-label">Duration</label>
 						<input type="text" name="duration" id="select-duration" class="form-control" value="<?php if($_POST['test']=="SEE") echo "3 Hours" ; else echo "75 Min"; ?>">
+						<label for="sub-max" class="control-label">Sub-question Marks</label>
+						<input type="number" name="sub-max" id="select-sub-max" class="form-control" value="20" placeholder="Select Max Marks for each Subquestion">
 						<label for="date" class="control-label">Instruction:</label>
 						<input type="text" name="instruction" id="select-instruction" class="form-control" value="<?php
 								 if($_POST['test']=="SEE") echo "Answer any five full questions, choosing one full question from each unit." ; 
@@ -89,6 +92,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 				    				<div class="panel-heading"><input class="text-center" placeholder="Enter Unit or Question no" id="q'.$i.'Title" value="'.$title.$i.'"/> <a class="pull-right" href="#"><span class="badge" style="font-size:1em">0</span>  marks</a> </div>
 				    				<div class="panel-body">
 				    					<div class="sub-container"></div>
+				    					<button title="Randomize" type="button" question="'.$i.'" class="randSub btn btn-default" >Randomize</button>
 				    					<button title="Add Question" type="button" id="q'.$i.'plus" question="'.$i.'" class="addSub btn btn-success" >Add Subquestion</button>
 				    				</div>
 				    			</div>
@@ -183,14 +187,34 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     $(document).ready(function(){
     	var noQ = <?php echo $_POST['test']=='CIE'?  '3': '5' ; ?>; // Total questions
     	var questions =[];
+    	var subMaxMarks = 20;
     	var qN =1; // Question being editted
     	var query = "questions";
     	//var tabs = ;
     	var c_id = "<?php echo $sub['course_id'] ; ?>";
     	
-    	function refreshBank(){
-			$(".tab-pane").each(function(){
-    			var id = $(this).attr("id").substring(1);
+    	function refreshBank(tab){
+    		if(typeof(tab)=='undefined'){
+    			//alert('refreshing all Tabs');
+				$(".tab-pane").each(function(){
+	    			var id = $(this).attr("id").substring(1);
+	    			$("#u"+id).html('<div class="spinner-container"><div class="spinner" ><img width="50px" src="img/loader.gif"/></div></div>');
+	    			$.ajax({
+			              type: "get",
+			              url: "fetch.php",
+			              data: { q: query ,course_id :c_id, unit:id},
+			              cache: false,
+			              async : false
+			            })
+			              .done(function( html ) {
+				                $("#u"+id).html(html); 
+						});
+	    		});
+	    	}
+	    	else{
+	    		//alert('refreshing Tab '+tab);
+	    		var t = $(".tab-pane").eq(tab-1);
+    			var id = t.attr("id").substring(1);
     			$("#u"+id).html('<div class="spinner-container"><div class="spinner" ><img width="50px" src="img/loader.gif"/></div></div>');
     			$.ajax({
 		              type: "get",
@@ -200,29 +224,31 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 		              async : false
 		            })
 		              .done(function( html ) {
-		              	
 			                $("#u"+id).html(html); 
-			                
 					});
-    		});
+	    		
+	    	}
 		}
 
-		$("#refresh").click(refreshBank);
-    	
+		$("#refresh").click(function(){
+			refreshBank();
+		});
+		
+
     	refreshBank();
-    	
-    	
-    		
+    	    		
 		
 		$("#qplus").click(function(){
-			qN++;
+			noQ++;
 			$("#questions").append('<div id="q1" class="panel panel-info">\
-				    				<div class="panel-heading"><input class="text-center" placeholder="Enter Unit or Question no" id="q'+qN+'Title" value="<?php if($_POST['test']=="SEE") echo "Unit" ; else echo "Question"; ?> '+qN+'"/> <a class="pull-right" href="#"><span class="badge" style="font-size:1em">0</span>  marks</a> </div>\
+				    				<div class="panel-heading"><input class="text-center" placeholder="Enter Unit or Question no" id="q'+noQ+'Title" value="<?php if($_POST['test']=="SEE") echo "Unit" ; else echo "Question"; ?> '+noQ+'"/> <a class="pull-right" href="#"><span class="badge" style="font-size:1em">0</span>  marks</a> </div>\
 				    				<div class="panel-body">\
 				    					<div class="sub-container"></div>\
-				    					<button title="Add Question" type="button" id="q'+qN+'plus" question="'+qN+'" class="addSub btn btn-success" >Add Subquestion</button>\
+				    					<button title="Randomize" type="button" id="q'+noQ+'rand" question="'+noQ+'" class="randSub btn btn-default" >Randomize</button>\
+				    					<button title="Add Question" type="button" id="q'+noQ+'plus" question="'+noQ+'" class="addSub btn btn-success" >Add Subquestion</button>\
 				    				</div>\
 				    			</div>');
+			$("#questions").sortable();
 			assignQHandler();
 		});
 
@@ -244,6 +270,15 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     		
     		});
     		
+    	$(".randSub").click(function(){
+	    		//container = $(this).parent();
+	    		qN = $(this).attr("question");
+	    		//alert('randomizing'+qN);
+	    		populateQuestions(qN);     
+    		
+    		});
+    		
+    		
     		$('.sub-container').each(function(){
     				$(this).sortable({
     					placeholder: "portlet-placeholder ui-state-highlight"
@@ -258,6 +293,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     	function addQ(ref){
     			//alert('Add called Caller : '+ arguments.callee.caller.toString());
     			ref.parents().eq(4).hide('fast');
+    			ref.parents().eq(4).attr("title","Drag this to ReOrder");
     			//alert(container.find('.sub-container').html());
       			container.append(ref.parents().eq(4));
     			ref.removeClass("btn-success");
@@ -288,6 +324,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     		 		//alert('Remove called Caller : '+ arguments.callee.caller.toString());
     				ref.addClass("btn-success");
     				ref.removeClass("btn-danger");
+    				ref.parents().eq(4).attr("title","Click Add button to select");
     				$("#u"+ref.attr("unit")).prepend(ref.parents().eq(4))
     				ref.html("Add");
 	    			var m = ref.parent().prev();
@@ -321,64 +358,79 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     	}
     	
     	function removeQuestionsFromSub(container){
+    		//alert("cleared sub")
     		container.find('.addQ').each(function(){
     			removeQ($(this));
     		});
     	}
     	
-    	function populateQuestions(){
-    		
-    		for (var i = 1; i <= noQ; i++) {
+    	function populateQuestions(unit){
+    		//alert(unit);
+    		var units=[];
+    		if(typeof(unit)!='undefined'){
+				units=[unit];
+				//refreshBank(unit);
+			}else{
+				for(var i=1;i<=noQ;i++){
+					units[units.length]=i;
+				}
+				refreshBank();
+			}
+			//alert(units.join(","));
+    		units.forEach(function(i) {
     			// Decide on two, three or 4 questions
+    			//alert(i);
     			n = [2,3,4];
     			container = $(".sub-container").eq(i-1);
     			var flag=false;
     			var tries = 0;
-    			while(!flag && tries<4){
+    			while(!flag && tries<5){
     				removeQuestionsFromSub(container);
+    				var tab= <?php echo ($_POST['test']=='CIE')? '$(".tab-pane")':'$(".tab-pane").eq(i-1)';  ?>;
+    				//alert(tab.html());
     				no = n[Math.floor(Math.random() * n.length)];
     				//alert(n);
 	    			switch(no){
 	    				case 2:
-	    						q = $(".tab-content .addQ[marks='10']").eq(0);
+	    						q = tab.find(".addQ[marks='10']").eq(0);
 	    						if(!q.length)
 	    							break;
 	    						addQ(q);
-	    						q = $(".tab-content .addQ[marks='10']").eq(1);
+	    						q =  tab.find(".addQ[marks='10']").eq(0);
 	    						if(!q.length)
 	    							break;
 	    						addQ(q);
 	    						flag=true;
 	    					break;
 	    				case 3:
-	    						q = $(".tab-content .addQ[marks='10']").eq(0);
+	    						q =  tab.find(".addQ[marks='10']").eq(0);
 	    						if(!q.length)
 	    							break;	    						
 	    						addQ(q);
-	    						q = $(".tab-content .addQ[marks='5']").eq(0);
+	    						q =  tab.find(".addQ[marks='5']").eq(0);
 	    						if(!q.length)
 	    							break;
 	    						addQ(q);
-	    						q = $(".tab-content .addQ[marks='5']").eq(0);
+	    						q =  tab.find(".addQ[marks='5']").eq(0);
 	    						if(!q.length)
 	    							break;
 	    						addQ(q);
 	    						flag=true;
 	    					break;
 	    				case 4:
-	    						q = $(".tab-content .addQ[marks='5']").eq(0);
+	    						q =  tab.find(".addQ[marks='5']").eq(0);
 	    						if(!q.length)
 	    							break;	    						
 	    						addQ(q);
-	    						q = $(".tab-content .addQ[marks='5']").eq(0);
+	    						q =  tab.find(".addQ[marks='5']").eq(0);
 	    						if(!q.length)
 	    							break;	    						
 	    						addQ(q);
-	    						q = $(".tab-content .addQ[marks='5']").eq(0);
+	    						q =  tab.find(".addQ[marks='5']").eq(0);
 	    						if(!q.length)
 	    							break;	    						
 	    						addQ(q);
-	    						q = $(".tab-content .addQ[marks='5']").eq(0);
+	    						q =  tab.find(".addQ[marks='5']").eq(0);
 	    						if(!q.length)
 	    							break;	    						
 	    						addQ(q);
@@ -386,23 +438,36 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 								flag=true;
 							break;	
 	    			}
-	    			if(flag)
+	    			if(!flag){
 	    				tries++;
+	    				//alert('For Question :'+i+' Trying '+tries+' Time')
+	    			}
 	    		}
-	    		if(tries>4)
-    				alert("Seems like there aren't enough questions to generate automaticaclly. Please add questions and try again.");
-    		}
+	    		if(tries>4){
+    				alert("Unable to generate questions automatically for Question "+i+". Seems like there aren't enough questions to generate automaticaclly. Please add questions and try again or you can try adding Manually");
+    				//window.location.assign("add.php");
+    				return;
+    			}
+    		});
     	}
     	populateQuestions();
     	
+    	
     	$(document).tooltip();
     	
-		$('#populate').click(populateQuestions);
+		$('#populate').click(function(){
+			populateQuestions();
+		});
+    	
     	function convertDate(inputFormat) {
 		  function pad(s) { return (s < 10) ? '0' + s : s; }
 		  var d = new Date(inputFormat);
 		  return [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/');
 		}
+		
+		
+		
+		
 		var date;
     	$( "#select-date" ).change(function () {
 				    var value = $(this).val();
@@ -427,6 +492,12 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 				    var value = $(this).val();
 				    $(this).parent().addClass("has-success has-feedback");
 				    $("#pTest").html(value); 
+		});
+		$( "#select-sub-max" ).change(function () {
+				    subMaxMarks = $(this).val();
+				    $(this).parent().addClass("has-success has-feedback");
+				    if(confirm("You have changed the maximum marks for each subquestion. Press OK to regenerate Questions again."))
+				    	populateQuestions();
 		});
 		var inst = $( "#select-instruction" ).val();
     	$( "#select-instruction" ).keyup(function () {
