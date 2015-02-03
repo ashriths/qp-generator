@@ -60,7 +60,7 @@ switch ($_GET['q']) {
 	
 case 'similar':
 	//prettyPrint($_GET); 
-	if(strlen($_GET['text']) < 1 || count(split(' ', $_GET['text'])) < 1 ){
+	if(strlen($_GET['text']) < 1 || count(explode(' ', $_GET['text'])) < 1 ){
 		echo 'Please start typing to see similar Questions';
 		exit;
 	}
