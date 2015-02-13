@@ -150,7 +150,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
 													    <div role="tabpanel" class="tab-pane" id="u2"></div>
 													    <div role="tabpanel" class="tab-pane" id="u3"></div>
 													    <div role="tabpanel" class="tab-pane" id="u4"></div>
-													    <div role="tabpanel" class="tab-pane" id="u4"></div>
+													    <div role="tabpanel" class="tab-pane" id="u5"></div>
 													  </div>
 												  		';
 										  	}

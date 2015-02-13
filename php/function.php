@@ -122,7 +122,7 @@ function fetchResult($sql){
         }
     
     }else{
-    	$rows= $result->fetch_assoc(); 
+    	$rows[0]= $result->fetch_assoc(); 
     }
 	//print_r($rows);
 	return array('count'=>mysqli_num_rows($result),'rows'=>$rows);
@@ -141,6 +141,7 @@ function getRelatedQuestions($cid,$unit,$text){
 			$sql = "SELECT * FROM question WHERE course_id = $cid AND unit = '$unit' AND text LIKE '%$word%'";
 			//echo $sql;
 			$result = fetchResult($sql);
+			//print_r($result);
 			if($result['count']>0){
 				foreach ($result['rows'] as $row) {
 					//print_r($row);
