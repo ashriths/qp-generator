@@ -565,6 +565,7 @@ $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);
     					sq.text = $(this).find(".qtext").html();
     					sq.marks =  $(this).find(":input[type='number']").val();
     					sq.copo = $(this).find("span").html();
+    					sq.img = $(this).find("img").attr("src");
     					//alert(sq.copo);
     					q.sub.push(sq);
     				});

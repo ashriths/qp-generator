@@ -6,14 +6,66 @@ require($rp.'php/design.php');
 require($rp.'php/function.php');
 if(!isset($_SESSION['id']) || $_SESSION['type']!='admin')
 		Redirect::redirectTo($rp."login.php");
-//print_r($_POST);
-
+//prettyPrint($_POST);
+//prettyPrint($_FILES);
+$uploadOk = 1;
+$target_file = "";
+if(isset($_FILES["img"])){
+	// Upload Image
+	$target_dir = "uploads/";
+	$target_file = $target_dir . basename($_FILES["img"]["name"]);
+	$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+	// Check if image file is a actual image or fake image
+	if(isset($_POST["img"])) {
+	    $check = getimagesize($_FILES["img"]["tmp_name"]);
+	    if($check !== false) {
+	        echo "File is an image - " . $check["mime"] . ".";
+	        $uploadOk = 1;
+	    } else {
+	        echo "File is not an image.";
+	        $uploadOk = 0;
+	    }
+	}
+	// Check if file already exists
+	if (file_exists($target_file)) {
+	    //echo "Sorry, file already exists.";
+	    $i=1;
+	    while(file_exists($target_file))
+			$target_file = $target_dir.($i++).basename($_FILES["img"]["name"]) ;
+	
+	}
+	// Check file size
+	if ($_FILES["img"]["size"] > 500000) {
+	    echo "Sorry, your file is too large.";
+	    $uploadOk = 0;
+	}
+	// Check if $uploadOk is set to 0 by an error
+	if ($uploadOk == 0) {
+	    echo "Sorry, your file was not uploaded.";
+	// if everything is ok, try to upload file
+	} else {
+	    if (move_uploaded_file($_FILES["img"]["tmp_name"], $target_file)) {
+	        //echo "The file ". basename( $_FILES["img"]["name"]). " has been uploaded.";
+	    } else {
+	        echo "Sorry, there was an error uploading your file.";
+	    }
+	}
+}
+// End Upload Image
 if(isset($_POST['course'])) {
 	$pos="";
 	foreach ($_POST['po'] as $po) {
 		$pos = $pos.", ".$po;
 	}
-    $result =  addQuestion($_POST['course'],$_POST['unit'],$_POST['text'],$_POST['marks'],"CO".$_POST['co'],substr($pos,1)," ");		
+	if($uploadOk){
+		if(isset($_FILES["img"]))
+			$img_url = $rp.'uploads/'.$_FILES["img"]["name"];
+		else 
+			$img_url = "";
+		$result =  addQuestion($_POST['course'],$_POST['unit'],$_POST['text'],$_POST['marks'],"CO".$_POST['co'],substr($pos,1),$img_url);
+	}else
+		$result = -1;
+    		
 }
 
 ?><!DOCTYPE html>
@@ -23,6 +75,7 @@ if(isset($_POST['course'])) {
     $design->getIncludeFiles($rp);
     ?>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" src="js/upload.js"></script>
       <title>Question Paper Generator | BMSCE</title>
   </head>
   <body >
@@ -37,7 +90,9 @@ if(isset($_POST['course'])) {
       		if($result>0){
       			echo '<div class="alert alert-success" role="alert">Oh wow! Your question was uploaded successfully.</div>';
       		}else{
-      			echo '<div class="alert alert-danger" role="alert">Oh Snap! Your question was not uploaded. Please try again.</div>';
+      			if(isset($_FILES['img']))
+      				echo '<div class="alert alert-danger" role="alert">Oh Snap! Your question was not uploaded. Please try again.</div>';
+				echo '<div class="alert alert-danger" role="alert">Oh Snap! Your question was not uploaded. Please try again.</div>';
       		}
       	}
       ?>
@@ -55,7 +110,7 @@ if(isset($_POST['course'])) {
 				        <h3 class="modal-title" id="myModalLabel">Ready to add Question!</h3>
 				      </div>
 				      <div class="modal-body">
-				        <form action="add.php" method="post" class="form-horizontal" id="myForm">
+				        <form action="add.php" method="post" class="form-horizontal" enctype="multipart/form-data" id="myForm">
 						 
 						</form>
 				      </div>
@@ -234,6 +289,7 @@ if(isset($_POST['course'])) {
 										    <label for="test" class="col-sm-2 control-label">Question:</label>\
 										     <div class="col-sm-9">\
 										      <textarea data-trigger="focus" data-placement="bottom" title="Similar Questions" id="select-text" name="text" class="form-control"></textarea>\
+											<label>Image(<5MB):<input type="file" accept=".gif,.jpg,.jpeg,.png" name="img" id="select-pic"/></label>\
 											</div>\
 						 	 	</div>').appendTo("#myForm");
 						 $( "#select-text" ).popover(

@@ -1,8 +1,6 @@
 <?php
 
 require('fpdf17/fpdf.php');
-if(!isset($_SESSION['id']))
-		Redirect::redirectTo($rp."login.php");
 
 //print_r($_POST);
 $pdf = new FPDF();
@@ -61,6 +59,12 @@ foreach ($questions as $q ) {
 				$pdf->Cell(50,5,$sq['copo'],0,0,'L');
 				$pdf->Cell(0,5,"(".trim($sq['marks']).")",0,0,'R');
 				$pdf->Ln(10);
+				if(isset($sq['img'])&&strlen($sq['img'])>3){
+					$image = $sq['img'];
+					$pdf->Cell( 0, 100, $pdf->Image($image, $pdf->GetX(), $pdf->GetY(), 150, 100), 0, 0, 'C', false );
+					$pdf->Ln(100);
+				}
+				
 		}
 		$pdf->Ln(5);
 	}

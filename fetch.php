@@ -31,8 +31,11 @@ switch ($_GET['q']) {
                               <button type="button" disabled class="btn btn-default">'.$q['question_id'].'</button>
                       </div>
                       <div class="col-md-8">
-                      <div class="qtext">'.$q['text'].'</div> <strong> <span> [ '.$q['co'].", ".$q['po'].' ]</span> from '.$q['unit'].'</strong>
-                      </div>
+                      <div class="qtext">'.$q['text'].'</div> <strong> <span> [ '.$q['co'].", ".$q['po'].' ]</span> from '.$q['unit'].'</strong><br/>';
+           if (strlen($q['img'])>3 ){
+           	 echo '<img width="100%" src="'.$q['img'].'"/>';
+           }           
+                    echo '</div>
 
                        <div class="col-md-3">
                             <div class="input-group">
