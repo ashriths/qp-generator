@@ -4,7 +4,8 @@ $rp = './';
 require ($rp.'redirect.php');
 require($rp.'php/design.php');
 require($rp.'php/function.php');
-
+if(!isset($_SESSION['id']) || $_SESSION['type']!='admin')
+		Redirect::redirectTo($rp."login.php");
 //print_r($_POST);
 
 if(isset($_POST['course'])) {
@@ -364,7 +365,10 @@ if(isset($_POST['course'])) {
     	}
 
     	function afterPo(){
+    		
     		$('.modal-footer').append('<button type="button" id="submit-button" class="btn btn-primary">Submit</button>');
+    		var s = '<label>Add another similar Question<input type="checkbox" name="add-another" checked="false" /></label>';
+    		$("#myForm").append(s); 
     		$("#submit-button").click(function(){
     			if( $("#select-po input:checked").length == 0 ) {
     				alert("Please select atleast one PO");

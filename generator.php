@@ -5,7 +5,8 @@ require ($rp.'redirect.php');
 require($rp.'php/design.php');
 require($rp.'php/function.php');
 
-
+if(!isset($_SESSION['id']))
+		Redirect::redirectTo($rp."login.php");
 //print_r($_POST);
 
 $sub =  getTableDetailsbyId("course","course_id",$_POST['course']);

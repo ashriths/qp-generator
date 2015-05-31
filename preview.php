@@ -1,6 +1,9 @@
 <?php
 
 require('fpdf17/fpdf.php');
+if(!isset($_SESSION['id']))
+		Redirect::redirectTo($rp."login.php");
+
 //print_r($_POST);
 $pdf = new FPDF();
 $pdf->AddPage();

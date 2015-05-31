@@ -16,6 +16,38 @@ function setupDatabase(){
     return $db;
   }
 
+function authenticate($email,$password){
+		$db = setupDatabase();
+		$email = $db->real_escape_string($email);
+		$password = $db->real_escape_string($password);
+		$hashedPassword = sha1($password);
+		$sql = "SELECT * FROM user WHERE email = '$email'";
+		//echo $sql;
+		$result = $db->query($sql);
+		if(!$result){	
+			die('Error:'.$db->error);
+		}
+		if($result->num_rows==1){
+			//echo 'User Exists<br/>';
+			$user=$result->fetch_assoc();
+			//print_r($user);
+			if($user['password']==$hashedPassword){
+				//user exists
+				//echo 'User Entered Correct Password';
+				return array('result'=>1,'type'=>$user['type'],'user_id'=>$user['user_id'], 'user'=>$user); 
+				
+			}
+			else{
+				//echo 'User Entered Wrong password';
+				return array('result'=>0,'message'=>'Hey '.$user['name'].' you didn\'t enter your coreect password.'); 
+			}
+		}
+	
+		//echo 'User Not Found anywhere';
+		return array('result'=>0,'message'=>'We don\'t recognize your email. Please chack again.'); 
+		
+	}
+
 function getTableDetailsbyNonId($table,$att,$value)
   {
     $db = setupDatabase();
@@ -179,6 +211,28 @@ function getRelatedQuestions($cid,$unit,$text){
 		$id = $db->insert_id;
 		return $id;
 	}
+
+class Session{
+
+	
+	public function createSession($id,$type){
+		$_SESSION['id']=$id;
+		$_SESSION['type']=$type;
+	}
+	
+
+	function __construct(){
+		session_start();
+	}
+
+	function destroySession(){
+
+		session_destroy();
+	} 
+
+}
+
+$session = new Session();
 
 
 

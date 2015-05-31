@@ -3,8 +3,10 @@
 $rp = './';
 require ($rp.'redirect.php');
 require($rp.'php/design.php');
+require($rp.'php/function.php');
 require_once 'php/config.php';
-
+if(!isset($_SESSION['id']))
+		Redirect::redirectTo($rp."login.php");
 ?><!DOCTYPE html>
 <html lang="en">
   <head>
@@ -14,15 +16,27 @@ require_once 'php/config.php';
       <title>Question Paper Generator | BMSCE</title>
   </head>
   <body >
-   
-    <hr />
+  <?php   $design->getNavbar($rp,$_SESSION['name']);
+  ?>
+    <hr /><hr />
     <div class="container ">
       <div class="row">
 		  <div class="jumbotron">
-		  <h1>Hello!</h1>
+		  <h1>Hello <?php echo $_SESSION['name']; ?>!</h1>
 		  <p>create question papers very easily.</p>
 		  <div class="btn-group">
-		 	 <p><button class="btn btn-success btn-lg" id="create" href="#" role="button">Create Now</button><a href="add.php" ><button class="btn btn-warning btn-lg" id="add" href="#" role="button">Add Question</button></a></p>
+		 	 <p>
+		 	 	<button class="btn btn-success btn-lg" id="create" href="#" role="button">Create Now</button>
+		 	 	<?php 
+		 	 	if ($_SESSION['type']=='admin') {
+		 	 	?>
+		 	 	<a href="add.php" >
+		 	 		<button class="btn btn-warning btn-lg" id="add" href="#" role="button">Add Question</button>
+		 	 	</a>
+		 	 	<?php
+				}
+		 	 	 ?>
+		 	 </p>
 		  </div>
 		</div>
 
